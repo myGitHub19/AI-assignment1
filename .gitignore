@@ -1,5 +1,6 @@
 # Ignore virtual environments
 venv/
+.venv/
 
 # Ignore Python cache files
 __pycache__/
@@ -8,3 +9,4 @@ __pycache__/
 
 # Ignore test case outputs (if any)
 *.out
+
