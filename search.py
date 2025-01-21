@@ -64,8 +64,6 @@ class SearchProblem:
         util.raiseNotDefined()
 
 
-
-
 def tinyMazeSearch(problem: SearchProblem) -> List[Directions]:
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -115,12 +113,73 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Queue for frontier
+    frontier = util.Queue()
+
+    # Each element in the queue: (current_state, path_taken_so_far)
+    start_state = problem.getStartState()
+    frontier.push((start_state, []))
+
+    # Keep track of visited states
+    visited = set()
+
+    while not frontier.isEmpty():
+        current_state, path = frontier.pop()
+
+        # If we reach the goal, return the path
+        if problem.isGoalState(current_state):
+            return path
+
+        # If not visited, expand
+        if current_state not in visited:
+            visited.add(current_state)
+
+            # Get successors
+            for successor, action, step_cost in problem.getSuccessors(current_state) or []:
+                if successor not in visited:
+                    # Append new action to existing path
+                    new_path = path + [action]
+                    frontier.push((successor, new_path))
+
+    # If no solution found
+    return []
+
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Priority queue for frontier
+    frontier = util.PriorityQueue()
+
+    # Each element in the priority queue: (current_state, path_taken_so_far, total_cost)
+    start_state = problem.getStartState()
+    frontier.push((start_state, [], 0), 0)
+
+    # Keep track of visited states and their costs
+    visited = {}
+
+    while not frontier.isEmpty():
+        current_state, path, cost = frontier.pop()
+
+        # If we reach the goal, return the path
+        if problem.isGoalState(current_state):
+            return path
+
+        # If not visited or we found a cheaper path
+        if current_state not in visited or cost < visited[current_state]:
+            visited[current_state] = cost
+
+            # Get successors
+            for successor, action, step_cost in problem.getSuccessors(current_state) or []:
+                new_cost = cost + step_cost
+                if successor not in visited or new_cost < visited.get(successor, float('inf')):
+                    # Append new action to existing path
+                    new_path = path + [action]
+                    frontier.push((successor, new_path, new_cost), new_cost)
+
+    # If no solution found
+    return []
+
 
 def nullHeuristic(state, problem=None) -> float:
     """
@@ -132,7 +191,39 @@ def nullHeuristic(state, problem=None) -> float:
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Priority queue for frontier
+    frontier = util.PriorityQueue()
+
+    # Each element in the priority queue: (current_state, path_taken_so_far, total_cost)
+    start_state = problem.getStartState()
+    frontier.push((start_state, [], 0), 0)
+
+    # Keep track of visited states and their costs
+    visited = {}
+
+    while not frontier.isEmpty():
+        current_state, path, cost = frontier.pop()
+
+        # If we reach the goal, return the path
+        if problem.isGoalState(current_state):
+            return path
+
+        # If not visited or we found a cheaper path
+        if current_state not in visited or cost < visited[current_state]:
+            visited[current_state] = cost
+
+            # Get successors
+            for successor, action, step_cost in problem.getSuccessors(current_state) or []:
+                new_cost = cost + step_cost
+                if successor not in visited or new_cost < visited.get(successor, float('inf')):
+                    # Append new action to existing path
+                    new_path = path + [action]
+                    heuristic_cost = new_cost + heuristic(successor, problem)
+                    frontier.push((successor, new_path, new_cost), heuristic_cost)
+
+    # If no solution found
+    return []
+
 
 # Abbreviations
 bfs = breadthFirstSearch
